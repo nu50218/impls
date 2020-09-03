@@ -26,7 +26,7 @@ $ impls types go/ast.Expr
 $ impls vars error fmt
 /usr/local/go/src/fmt/scan.go:466:5 fmt.boolError
 /usr/local/go/src/fmt/scan.go:465:5 fmt.complexError
-``
+```
 
 - 型からinterfaceを見つける
 
