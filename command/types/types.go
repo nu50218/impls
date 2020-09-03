@@ -70,6 +70,10 @@ func (*c) Run(args []string) error {
 			if exported && !obj.Exported() {
 				continue
 			}
+			t, _ := obj.(*types.TypeName)
+			if t == nil {
+				continue
+			}
 			if implements(obj.Type(), i) {
 				fmt.Println(pkg.Fset.Position(obj.Pos()), pkg.Types.Name()+"."+obj.Name())
 			}
