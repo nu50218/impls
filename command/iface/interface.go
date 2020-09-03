@@ -63,7 +63,10 @@ func interfacesCmd(args []string) error {
 	}
 
 	target := args[0]
-	loadPkgs := append(args[1:], target[:strings.LastIndex(target, ".")])
+	loadPkgs := args[1:]
+	if strings.Contains(target, ".") {
+		loadPkgs = append(loadPkgs, target[:strings.LastIndex(target, ".")])
+	}
 	pkgs, err := impls.LoadPkgs(loadPkgs...)
 	if err != nil {
 		return err
