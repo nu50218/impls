@@ -17,7 +17,7 @@ const name = "interfaces"
 
 var Command (command.Command) = &c{}
 
-var errorIface = types.Universe.Lookup("error").(*types.TypeName)
+// var errorIface = types.Universe.Lookup("error").(*types.TypeName)
 
 var (
 	flagSet          = flag.NewFlagSet(name, flag.ExitOnError)
