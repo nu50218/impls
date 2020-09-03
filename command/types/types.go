@@ -29,6 +29,7 @@ func (*c) Name() string {
 }
 
 // Run 下のような感じで動かしたい
+// $ impls types [options] io.Writer
 // $ impls types [options] io.Writer io
 // $ impls types [options] io.Writer ./... io
 func (*c) Run(args []string) error {
@@ -37,7 +38,7 @@ func (*c) Run(args []string) error {
 	}
 
 	flagArgs := flagSet.Args()
-	if len(flagArgs) < 2 {
+	if len(flagArgs) < 1 {
 		return errors.New("invalid arguments")
 	}
 
