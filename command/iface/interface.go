@@ -78,7 +78,7 @@ func interfacesCmd(args []string) error {
 		return err
 	}
 
-	fmt.Printf("%s\n", obj.Type())
+	fmt.Printf("%s.%s\n", obj.Pkg().Path(), obj.Name())
 	for _, iface := range ifs {
 		i, err := impls.UnderlyingInterface(iface.Type())
 		if err != nil {
