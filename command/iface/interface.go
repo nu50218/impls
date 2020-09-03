@@ -80,9 +80,9 @@ func interfacesCmd(args []string) error {
 
 	fmt.Printf("%s\n", obj.Type())
 	for _, iface := range ifs {
-		i, _ := iface.Type().Underlying().(*types.Interface)
-		if i == nil {
-			return errors.New("invalid interface")
+		i, err := impls.UnderlyingInterface(iface.Type())
+		if err != nil {
+			return err
 		}
 		if types.Implements(obj.Type(), i) || types.Implements(types.NewPointer(obj.Type()), i) {
 			fmt.Printf("\t%s\n", iface.Type())
