@@ -39,6 +39,10 @@ func typeObjFromName(s string, pkgs []*packages.Package) (types.Object, error) {
 		return types.Universe.Lookup("error"), nil
 	}
 
+	if !strings.Contains(s, ".") {
+		return nil, errors.New("invalid syntax")
+	}
+
 	comma := strings.LastIndex(s, ".")
 	path := s[:comma]
 	name := s[comma+1:]
