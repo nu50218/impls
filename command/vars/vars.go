@@ -1,4 +1,4 @@
-package types
+package vars
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-const name = "types"
+const name = "vars"
 
 var Command (command.Command) = &c{}
 
@@ -35,9 +35,9 @@ func (*c) Name() string {
 }
 
 // Run 下のような感じで動かしたい
-// $ impls types [options] io.Writer
-// $ impls types [options] io.Writer io
-// $ impls types [options] io.Writer ./... io
+// $ impls vars [options] io.Writer
+// $ impls vars [options] io.Writer io
+// $ impls vars [options] io.Writer ./... io
 func (*c) Run(args []string) error {
 	if err := flagSet.Parse(args); err != nil {
 		return err
@@ -70,8 +70,8 @@ func (*c) Run(args []string) error {
 			if exported && !obj.Exported() {
 				continue
 			}
-			t, _ := obj.(*types.TypeName)
-			if t == nil {
+			v, _ := obj.(*types.Var)
+			if v == nil {
 				continue
 			}
 			if impls.Implements(obj.Type(), i) {

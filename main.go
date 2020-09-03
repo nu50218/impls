@@ -10,6 +10,7 @@ import (
 	"github.com/nu50218/impls/command/help"
 	"github.com/nu50218/impls/command/iface"
 	"github.com/nu50218/impls/command/types"
+	"github.com/nu50218/impls/command/vars"
 )
 
 func run(args []string) error {
@@ -22,6 +23,7 @@ func run(args []string) error {
 		help.Command,
 		iface.Command,
 		types.Command,
+		vars.Command,
 	}
 
 	for _, sc := range subCommands {
