@@ -1,6 +1,7 @@
 package impls
 
 import (
+	"errors"
 	"go/types"
 
 	"golang.org/x/tools/go/packages"
@@ -34,6 +35,12 @@ func objsFromPkgs(isInterface bool, patterns ...string) ([]types.Object, error) 
 	return objs, nil
 }
 
+func LoadPkgs(patterns ...string) ([]*packages.Package, error) {
+	mode := packages.NeedSyntax | packages.NeedTypes | packages.NeedDeps | packages.NeedTypesInfo | packages.NeedImports
+	cfg := &packages.Config{Mode: mode}
+	return packages.Load(cfg, patterns...)
+}
+
 // TypeObjsFromPkgs はパッケージ名の可変長引数で与えられたパッケージで定義されたユーザ定義型の types.Object を取得する
 func TypeObjsFromPkgs(patterns ...string) ([]types.Object, error) {
 	objs, err := objsFromPkgs(false, patterns...)
@@ -59,7 +66,7 @@ func UnderlyingInterface(t types.Type) (*types.Interface, error) {
 	case *types.Interface:
 		return t, nil
 	case *types.Named:
-		return UnderlyingInterface(t)
+		return UnderlyingInterface(t.Underlying())
 	default:
 		return nil, errors.New("not interface")
 	}
