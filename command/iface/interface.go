@@ -35,6 +35,10 @@ func (*c) Name() string {
 }
 
 func typeObjFromName(s string, pkgs []*packages.Package) (types.Object, error) {
+	if s == "error" {
+		return types.Universe.Lookup("error"), nil
+	}
+
 	comma := strings.LastIndex(s, ".")
 	path := s[:comma]
 	name := s[comma+1:]
@@ -63,11 +67,6 @@ func interfacesCmd(args []string) error {
 	}
 
 	target := args[0]
-	if target == "error" {
-		fmt.Println("error")
-		return nil
-	}
-
 	loadPkgs := args[1:]
 	if strings.Contains(target, ".") {
 		loadPkgs = append(loadPkgs, target[:strings.LastIndex(target, ".")])
