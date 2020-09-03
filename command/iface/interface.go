@@ -17,8 +17,6 @@ const name = "interfaces"
 
 var Command (command.Command) = &c{}
 
-// var errorIface = types.Universe.Lookup("error").(*types.TypeName)
-
 var (
 	flagSet          = flag.NewFlagSet(name, flag.ExitOnError)
 	flagIncludeError bool
@@ -76,10 +74,6 @@ func interfacesCmd(args []string) error {
 	if err != nil {
 		return err
 	}
-
-	// if flagIncludeError {
-	// 	ifs = append(ifs, errorIface)
-	// }
 
 	for _, pkg := range pkgs {
 		scoop := pkg.Types.Scope()
