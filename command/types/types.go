@@ -103,18 +103,15 @@ func findInterface(s string, pkgs []*packages.Package) (*types.Interface, error)
 	}
 
 	for _, pkg := range pkgs {
-		scope := pkg.Types.Scope()
-		for _, n := range scope.Names() {
-			obj := scope.Lookup(n)
-			if obj.Name() != ifaceName || obj.Pkg().Path() != buildPkg.ImportPath {
-				continue
-			}
-			i, err := impls.UnderlyingInterface(obj.Type())
-			if err != nil {
-				return nil, err
-			}
-			return i, nil
+		obj := pkg.Types.Scope().Lookup(ifaceName)
+		if obj.Pkg().Path() != buildPkg.ImportPath {
+			continue
 		}
+		i, err := impls.UnderlyingInterface(obj.Type())
+		if err != nil {
+			return nil, err
+		}
+		return i, nil
 	}
 
 	return nil, errors.New("not found")
