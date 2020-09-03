@@ -21,8 +21,12 @@ var flagSet = flag.NewFlagSet(name, flag.ExitOnError)
 
 // オプション
 var (
-	exported = flagSet.Bool("exported", false, "only exported")
+	exported bool
 )
+
+func init() {
+	flagSet.BoolVar(&exported, "exported", false, "only exported")
+}
 
 type c struct{}
 
@@ -63,7 +67,7 @@ func (*c) Run(args []string) error {
 		scope := pkg.Types.Scope()
 		for _, n := range scope.Names() {
 			obj := scope.Lookup(n)
-			if exported != nil && *exported && !obj.Exported() {
+			if exported && !obj.Exported() {
 				continue
 			}
 			if implements(obj.Type(), i) {
