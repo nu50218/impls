@@ -89,13 +89,9 @@ func interfacesCmd(args []string) error {
 				continue
 			}
 
-			if !types.IsInterface(iface.Type()) {
-				continue
-			}
-
 			i, err := impls.UnderlyingInterface(iface.Type())
 			if err != nil {
-				return err
+				continue
 			}
 
 			if impls.Implements(obj.Type(), i) {
