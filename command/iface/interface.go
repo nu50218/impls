@@ -97,7 +97,7 @@ func (*c) Run(args []string) error {
 		return err
 	}
 
-	if err := interfacesCmd(args); err != nil {
+	if err := interfacesCmd(flagSet.Args()); err != nil {
 		return err
 	}
 
