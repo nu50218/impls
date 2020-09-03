@@ -41,7 +41,7 @@ func typeObjFromName(pkg string, name string) (types.Object, error) {
 	return obj, nil
 }
 
-func showImplList(args []string) error {
+func interfacesCmd(args []string) error {
 	if len(args) < 2 {
 		return errors.New("invalid arguments")
 	}
@@ -84,7 +84,7 @@ func (*c) Run(args []string) error {
 		return err
 	}
 
-	if err := showImplList(args); err != nil {
+	if err := interfacesCmd(args); err != nil {
 		return err
 	}
 
