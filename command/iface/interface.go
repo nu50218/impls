@@ -46,11 +46,12 @@ func typeObjFromName(s string, pkgs []*packages.Package) (types.Object, error) {
 
 	for _, pkg := range pkgs {
 		obj := pkg.Types.Scope().Lookup(name)
-		if obj.Pkg().Path() != buildPkg.ImportPath {
+		if obj == nil {
 			continue
 		}
-
-		return obj, nil
+		if obj.Pkg().Path() == buildPkg.ImportPath {
+			return obj, nil
+		}
 	}
 
 	return nil, errors.New("not found")
