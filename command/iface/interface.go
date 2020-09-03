@@ -17,7 +17,16 @@ const name = "interfaces"
 
 var Command (command.Command) = &c{}
 
-var flagSet = flag.NewFlagSet(name, flag.ExitOnError)
+var errorIface = types.Universe.Lookup("error").(*types.TypeName)
+
+var (
+	flagSet          = flag.NewFlagSet(name, flag.ExitOnError)
+	flagIncludeError bool
+)
+
+func init() {
+	flagSet.BoolVar(&flagIncludeError, "e", true, "include error interface (default = true)")
+}
 
 type c struct{}
 
@@ -42,7 +51,7 @@ func typeObjFromName(pkg string, name string) (types.Object, error) {
 }
 
 func interfacesCmd(args []string) error {
-	if len(args) < 2 {
+	if len(args) < 1 || (len(args) < 2 && !flagIncludeError) {
 		return errors.New("invalid arguments")
 	}
 
@@ -58,6 +67,10 @@ func interfacesCmd(args []string) error {
 	ifs, err := impls.InterfacesFromPkgs(searchPkgs...)
 	if err != nil {
 		return err
+	}
+
+	if flagIncludeError {
+		ifs = append(ifs, errorIface)
 	}
 
 	obj, err := typeObjFromName(pkg, typ)
