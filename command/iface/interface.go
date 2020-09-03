@@ -4,8 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"go/build"
 	"go/types"
-	"path/filepath"
 	"strings"
 
 	"github.com/nu50218/impls/command"
@@ -34,20 +34,26 @@ func (*c) Name() string {
 	return name
 }
 
-func typeObjFromName(pkg string, name string) (types.Object, error) {
-	mode := packages.NeedSyntax | packages.NeedTypes | packages.NeedDeps | packages.NeedTypesInfo | packages.NeedImports
-	cfg := &packages.Config{Mode: mode}
-	pkgs, err := packages.Load(cfg, pkg)
+func typeObjFromName(s string, pkgs []*packages.Package) (types.Object, error) {
+	comma := strings.LastIndex(s, ".")
+	path := s[:comma]
+	name := s[comma+1:]
+
+	buildPkg, err := build.Default.Import(path, ".", build.ImportMode(0))
 	if err != nil {
 		return nil, err
 	}
 
-	obj := pkgs[0].Types.Scope().Lookup(name)
-	if obj == nil {
-		return nil, fmt.Errorf("lookup: not found type %s.%s", pkg, name)
+	for _, pkg := range pkgs {
+		obj := pkg.Types.Scope().Lookup(name)
+		if obj.Pkg().Path() != buildPkg.ImportPath {
+			continue
+		}
+
+		return obj, nil
 	}
 
-	return obj, nil
+	return nil, errors.New("not found")
 }
 
 func interfacesCmd(args []string) error {
@@ -55,37 +61,42 @@ func interfacesCmd(args []string) error {
 		return errors.New("invalid arguments")
 	}
 
-	targetType := args[0]
-	searchPkgs := args[1:]
-
-	typ := strings.TrimLeft(filepath.Ext(targetType), ".")
-	pkg := strings.TrimRight(strings.TrimSuffix(targetType, typ), ".")
-	if pkg == "" || typ == "" {
-		return errors.New("invalid type name")
-	}
-
-	ifs, err := impls.InterfacesFromPkgs(searchPkgs...)
+	target := args[0]
+	loadPkgs := append(args[1:], target[:strings.LastIndex(target, ".")])
+	pkgs, err := impls.LoadPkgs(loadPkgs...)
 	if err != nil {
 		return err
 	}
 
-	if flagIncludeError {
-		ifs = append(ifs, errorIface)
-	}
-
-	obj, err := typeObjFromName(pkg, typ)
+	obj, err := typeObjFromName(target, pkgs)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%s.%s\n", obj.Pkg().Path(), obj.Name())
-	for _, iface := range ifs {
-		i, err := impls.UnderlyingInterface(iface.Type())
-		if err != nil {
-			return err
-		}
-		if impls.Implements(obj.Type(), i) {
-			fmt.Printf("\t%s\n", iface.Type())
+	// if flagIncludeError {
+	// 	ifs = append(ifs, errorIface)
+	// }
+
+	for _, pkg := range pkgs {
+		scoop := pkg.Types.Scope()
+		for _, name := range scoop.Names() {
+			iface, _ := scoop.Lookup(name).(*types.TypeName)
+			if iface == nil {
+				continue
+			}
+
+			if !types.IsInterface(iface.Type()) {
+				continue
+			}
+
+			i, err := impls.UnderlyingInterface(iface.Type())
+			if err != nil {
+				return err
+			}
+
+			if impls.Implements(obj.Type(), i) {
+				fmt.Printf("%s %s.%s\n", pkg.Fset.Position(iface.Pos()), pkg.Types.Name(), iface.Name())
+			}
 		}
 	}
 
