@@ -58,7 +58,7 @@ func (*c) Run(args []string) error {
 		scope := pkg.Types.Scope()
 		for _, n := range scope.Names() {
 			obj := scope.Lookup(n)
-			if implements(obj.Type(), i) {
+			if impls.Implements(obj.Type(), i) {
 				fmt.Println(pkg.Fset.Position(obj.Pos()), pkg.Types.Name()+"."+obj.Name())
 			}
 		}
@@ -93,16 +93,4 @@ func findInterface(s string, pkgs []*packages.Package) (*types.Interface, error)
 	}
 
 	return nil, errors.New("not found")
-}
-
-func implements(V types.Type, T *types.Interface) bool {
-	if types.Implements(V, T) {
-		return true
-	}
-
-	if types.Implements(types.NewPointer(V), T) {
-		return true
-	}
-
-	return false
 }

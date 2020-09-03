@@ -84,7 +84,7 @@ func interfacesCmd(args []string) error {
 		if err != nil {
 			return err
 		}
-		if types.Implements(obj.Type(), i) || types.Implements(types.NewPointer(obj.Type()), i) {
+		if impls.Implements(obj.Type(), i) {
 			fmt.Printf("\t%s\n", iface.Type())
 		}
 	}

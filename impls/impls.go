@@ -71,3 +71,15 @@ func UnderlyingInterface(t types.Type) (*types.Interface, error) {
 		return nil, errors.New("not interface")
 	}
 }
+
+func Implements(V types.Type, T *types.Interface) bool {
+	if types.Implements(V, T) {
+		return true
+	}
+
+	if types.Implements(types.NewPointer(V), T) {
+		return true
+	}
+
+	return false
+}
