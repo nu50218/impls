@@ -43,7 +43,7 @@ func typeObjFromName(s string, pkgs []*packages.Package) (types.Object, error) {
 	}
 
 	for _, pkg := range pkgs {
-		obj := pkg.Types.Scope().Lookup(name).(*types.TypeName)
+		obj, _ := pkg.Types.Scope().Lookup(name).(*types.TypeName)
 		if obj == nil {
 			continue
 		}
