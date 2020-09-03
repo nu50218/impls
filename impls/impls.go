@@ -53,3 +53,14 @@ func InterfacesFromPkgs(patterns ...string) ([]types.Object, error) {
 
 	return ifaces, nil
 }
+
+func UnderlyingInterface(t types.Type) (*types.Interface, error) {
+	switch t := t.(type) {
+	case *types.Interface:
+		return t, nil
+	case *types.Named:
+		return UnderlyingInterface(t)
+	default:
+		return nil, errors.New("not interface")
+	}
+}
