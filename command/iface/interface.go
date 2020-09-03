@@ -22,6 +22,8 @@ var (
 	flagIncludeError bool
 )
 
+var errorIface, _ = types.Universe.Lookup("error").Type().Underlying().(*types.Interface)
+
 func init() {
 	flagSet.BoolVar(&flagIncludeError, "e", true, "include error interface (default = true)")
 }
@@ -61,6 +63,11 @@ func interfacesCmd(args []string) error {
 	}
 
 	target := args[0]
+	if target == "error" {
+		fmt.Println("error")
+		return nil
+	}
+
 	loadPkgs := args[1:]
 	if strings.Contains(target, ".") {
 		loadPkgs = append(loadPkgs, target[:strings.LastIndex(target, ".")])
@@ -92,6 +99,10 @@ func interfacesCmd(args []string) error {
 				fmt.Printf("%s %s.%s\n", pkg.Fset.Position(iface.Pos()), pkg.Types.Name(), iface.Name())
 			}
 		}
+	}
+
+	if flagIncludeError && impls.Implements(obj.Type(), errorIface) {
+		fmt.Println("error")
 	}
 
 	return nil
