@@ -43,7 +43,10 @@ func (*c) Run(args []string) error {
 	}
 
 	target := flagArgs[0]
-	loadPkgs := append(flagArgs[1:], target[:strings.LastIndex(target, ".")])
+	loadPkgs := flagArgs[1:]
+	if strings.Contains(target, ".") {
+		loadPkgs = append(loadPkgs, target[:strings.LastIndex(target, ".")])
+	}
 	pkgs, err := impls.LoadPkgs(loadPkgs...)
 	if err != nil {
 		return err
@@ -68,6 +71,15 @@ func (*c) Run(args []string) error {
 }
 
 func findInterface(s string, pkgs []*packages.Package) (*types.Interface, error) {
+	if s == "error" {
+		errType, _ := types.Universe.Lookup("error").Type().Underlying().(*types.Interface)
+		return errType, nil
+	}
+
+	if !strings.Contains(s, ".") {
+		return nil, errors.New("invalid syntax")
+	}
+
 	lastComma := strings.LastIndex(s, ".")
 	ifacePath := s[:lastComma]
 	ifaceName := s[lastComma+1:]
