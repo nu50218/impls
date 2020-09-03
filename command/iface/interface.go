@@ -58,7 +58,7 @@ func typeObjFromName(s string, pkgs []*packages.Package) (types.Object, error) {
 }
 
 func interfacesCmd(args []string) error {
-	if len(args) < 1 || (len(args) < 2 && !flagIncludeError) {
+	if len(args) < 1 {
 		return errors.New("invalid arguments")
 	}
 
