@@ -1,5 +1,7 @@
 # impls
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/nu50218/impls)](https://goreportcard.com/report/github.com/nu50218/impls)
+
 (README書きかけ)
 
 implsはinterfaceの実装を見つけたり、実装からinterfaceを見つけたりできるツールです。
