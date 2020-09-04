@@ -26,6 +26,17 @@ var (
 var errorIface, _ = types.Universe.Lookup("error").Type().Underlying().(*types.Interface)
 
 func init() {
+	flagSet.Usage = func() {
+		fmt.Printf("Usage of %s:\n", name)
+		fmt.Println()
+		fmt.Println("Examples:")
+		fmt.Println("  $ impls interfaces io.PipeWriter")
+		fmt.Println("  $ impls interfaces bytes.Buffer io")
+		fmt.Println()
+		fmt.Println("Options:")
+		flagSet.PrintDefaults()
+	}
+
 	flagSet.BoolVar(&flagIncludeError, "e", true, "include error interface (default = true)")
 	flagSet.BoolVar(&flagIncludeTest, "t", true, "include test package (default = true)")
 }
@@ -34,6 +45,14 @@ type c struct{}
 
 func (*c) Name() string {
 	return name
+}
+
+func (*c) Description() string {
+	return "find all interfaces by type"
+}
+
+func (*c) FlagSet() *flag.FlagSet {
+	return flagSet
 }
 
 func typeObjFromName(s string, pkgs []*packages.Package) (types.Object, error) {
