@@ -67,7 +67,11 @@ func typeObjFromName(s string, pkgs []*packages.Package) (types.Object, error) {
 	return nil, errors.New("not found")
 }
 
-func interfacesCmd(args []string) error {
+func (*c) Run(args []string) error {
+	if err := flagSet.Parse(args); err != nil {
+		return err
+	}
+
 	flagArgs := flagSet.Args()
 	if len(flagArgs) < 1 {
 		return errors.New("invalid arguments")
@@ -133,18 +137,6 @@ func interfacesCmd(args []string) error {
 
 	if flagIncludeError && impls.Implements(obj.Type(), errorIface) {
 		fmt.Println("error")
-	}
-
-	return nil
-}
-
-func (*c) Run(args []string) error {
-	if err := flagSet.Parse(args); err != nil {
-		return err
-	}
-
-	if err := interfacesCmd(flagSet.Args()); err != nil {
-		return err
 	}
 
 	return nil
