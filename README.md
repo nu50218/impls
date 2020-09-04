@@ -2,8 +2,6 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/nu50218/impls)](https://goreportcard.com/report/github.com/nu50218/impls)
 
-(README書きかけ)
-
 implsはinterfaceの実装を見つけたり、実装からinterfaceを見つけたりできるツールです。
 
 ## Install
@@ -48,3 +46,9 @@ $ impls interfaces bytes.Buffer io
 /usr/local/go/src/io/io.go:90:6 io.Writer
 /usr/local/go/src/io/io.go:181:6 io.WriterTo
 ```
+
+- help
+
+`$ impls help`
+
+`$ impls help types`
