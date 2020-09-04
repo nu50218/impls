@@ -22,11 +22,13 @@ var flagSet = flag.NewFlagSet(name, flag.ExitOnError)
 
 // オプション
 var (
-	exported bool
+	exported        bool
+	flagIncludeTest bool
 )
 
 func init() {
 	flagSet.BoolVar(&exported, "exported", false, "only exported")
+	flagSet.BoolVar(&flagIncludeTest, "t", true, "include test package (default = true)")
 }
 
 type c struct{}
@@ -54,7 +56,7 @@ func (*c) Run(args []string) error {
 	if strings.Contains(target, ".") {
 		loadPkgs = append(loadPkgs, target[:strings.LastIndex(target, ".")])
 	}
-	pkgs, err := impls.LoadPkgs(loadPkgs...)
+	pkgs, err := impls.LoadPkgs(flagIncludeTest, loadPkgs...)
 	if err != nil {
 		return err
 	}
