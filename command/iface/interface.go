@@ -67,17 +67,42 @@ func typeObjFromName(s string, pkgs []*packages.Package) (types.Object, error) {
 	return nil, errors.New("not found")
 }
 
-func interfacesCmd(args []string) error {
-	if len(args) < 1 {
+func (*c) Run(args []string) error {
+	if err := flagSet.Parse(args); err != nil {
+		return err
+	}
+
+	flagArgs := flagSet.Args()
+	if len(flagArgs) < 1 {
 		return errors.New("invalid arguments")
 	}
 
-	target := args[0]
-	loadPkgs := args[1:]
+	target := flagArgs[0]
+	var targetPkgPath string
+	loadPkgs := flagArgs[1:]
 	if strings.Contains(target, ".") {
-		loadPkgs = append(loadPkgs, target[:strings.LastIndex(target, ".")])
+		targetPkgPath = target[:strings.LastIndex(target, ".")]
+		loadPkgs = append(loadPkgs, targetPkgPath)
 	}
+
+	type pkgPathsResponse struct {
+		paths map[string]struct{}
+		err   error
+	}
+
+	pkgPathsChan := make(chan *pkgPathsResponse, 1)
+	go func() {
+		paths, err := impls.PkgPaths(flagArgs[1:]...)
+		pkgPathsChan <- &pkgPathsResponse{paths: paths, err: err}
+	}()
+
 	pkgs, err := impls.LoadPkgs(flagIncludeTest, loadPkgs...)
+	if err != nil {
+		return err
+	}
+
+	checkPkgIncludedResp := <-pkgPathsChan
+	paths, err := checkPkgIncludedResp.paths, checkPkgIncludedResp.err
 	if err != nil {
 		return err
 	}
@@ -88,6 +113,10 @@ func interfacesCmd(args []string) error {
 	}
 
 	for _, pkg := range pkgs {
+		if _, ok := paths[pkg.Types.Path()]; !ok && len(flagArgs) != 1 {
+			continue
+		}
+
 		scoop := pkg.Types.Scope()
 		for _, name := range scoop.Names() {
 			iface, _ := scoop.Lookup(name).(*types.TypeName)
@@ -108,18 +137,6 @@ func interfacesCmd(args []string) error {
 
 	if flagIncludeError && impls.Implements(obj.Type(), errorIface) {
 		fmt.Println("error")
-	}
-
-	return nil
-}
-
-func (*c) Run(args []string) error {
-	if err := flagSet.Parse(args); err != nil {
-		return err
-	}
-
-	if err := interfacesCmd(flagSet.Args()); err != nil {
-		return err
 	}
 
 	return nil
