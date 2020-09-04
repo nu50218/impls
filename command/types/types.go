@@ -57,11 +57,24 @@ func (*c) Run(args []string) error {
 		loadPkgs = append(loadPkgs, targetPkgPath)
 	}
 
-	targetPkgIncluded, err := impls.CheckPkgIncluded(targetPkgPath, flagArgs[1:]...)
+	type CheckPkgIncludedResponse struct {
+		included bool
+		err      error
+	}
+
+	checkPkgIncludedChan := make(chan *CheckPkgIncludedResponse, 1)
+	go func() {
+		included, err := impls.CheckPkgIncluded(targetPkgPath, flagArgs[1:]...)
+		checkPkgIncludedChan <- &CheckPkgIncludedResponse{included: included, err: err}
+	}()
+
+	pkgs, err := impls.LoadPkgs(loadPkgs...)
 	if err != nil {
 		return err
 	}
-	pkgs, err := impls.LoadPkgs(loadPkgs...)
+
+	checkPkgIncludedResp := <-checkPkgIncludedChan
+	targetPkgIncluded, err := checkPkgIncludedResp.included, checkPkgIncludedResp.err
 	if err != nil {
 		return err
 	}
