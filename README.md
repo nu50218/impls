@@ -1,5 +1,6 @@
 # impls
 
+[![Release](https://github.com/nu50218/impls/workflows/Release/badge.svg)](https://github.com/nu50218/impls/actions?query=workflow%3ARelease)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nu50218/impls)](https://goreportcard.com/report/github.com/nu50218/impls)
 
 implsはinterfaceの実装を見つけたり、実装からinterfaceを見つけたりできるツールです。
