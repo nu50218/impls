@@ -59,15 +59,15 @@ func (*c) Run(args []string) error {
 		loadPkgs = append(loadPkgs, targetPkgPath)
 	}
 
-	type CheckPkgIncludedResponse struct {
-		included bool
-		err      error
+	type pkgPathsResponse struct {
+		paths map[string]struct{}
+		err   error
 	}
 
-	checkPkgIncludedChan := make(chan *CheckPkgIncludedResponse, 1)
+	pkgPathsChan := make(chan *pkgPathsResponse, 1)
 	go func() {
-		included, err := impls.CheckPkgIncluded(targetPkgPath, flagArgs[1:]...)
-		checkPkgIncludedChan <- &CheckPkgIncludedResponse{included: included, err: err}
+		paths, err := impls.PkgPaths(flagArgs[1:]...)
+		pkgPathsChan <- &pkgPathsResponse{paths: paths, err: err}
 	}()
 
 	pkgs, err := impls.LoadPkgs(flagIncludeTest, loadPkgs...)
@@ -75,8 +75,8 @@ func (*c) Run(args []string) error {
 		return err
 	}
 
-	checkPkgIncludedResp := <-checkPkgIncludedChan
-	targetPkgIncluded, err := checkPkgIncludedResp.included, checkPkgIncludedResp.err
+	checkPkgIncludedResp := <-pkgPathsChan
+	paths, err := checkPkgIncludedResp.paths, checkPkgIncludedResp.err
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (*c) Run(args []string) error {
 	}
 
 	for _, pkg := range pkgs {
-		if !targetPkgIncluded && pkg.PkgPath == targetPkgPath {
+		if _, ok := paths[pkg.Types.Path()]; !ok && len(flagArgs) != 1 {
 			continue
 		}
 

@@ -7,19 +7,18 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-func CheckPkgIncluded(pkgPath string, patterns ...string) (bool, error) {
+func PkgPaths(patterns ...string) (map[string]struct{}, error) {
 	mode := packages.NeedDeps | packages.NeedTypes
 	cfg := &packages.Config{Mode: mode}
 	pkgs, err := packages.Load(cfg, patterns...)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
+	var res = make(map[string]struct{}, len(pkgs))
 	for _, pkg := range pkgs {
-		if pkg.Types.Path() == pkgPath {
-			return true, nil
-		}
+		res[pkg.Types.Path()] = struct{}{}
 	}
-	return false, nil
+	return res, nil
 }
 
 func LoadPkgs(incTest bool, patterns ...string) ([]*packages.Package, error) {
