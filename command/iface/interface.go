@@ -20,12 +20,14 @@ var Command (command.Command) = &c{}
 var (
 	flagSet          = flag.NewFlagSet(name, flag.ExitOnError)
 	flagIncludeError bool
+	flagIncludeTest  bool
 )
 
 var errorIface, _ = types.Universe.Lookup("error").Type().Underlying().(*types.Interface)
 
 func init() {
 	flagSet.BoolVar(&flagIncludeError, "e", true, "include error interface (default = true)")
+	flagSet.BoolVar(&flagIncludeTest, "t", true, "include test package (default = true)")
 }
 
 type c struct{}
@@ -75,7 +77,7 @@ func interfacesCmd(args []string) error {
 	if strings.Contains(target, ".") {
 		loadPkgs = append(loadPkgs, target[:strings.LastIndex(target, ".")])
 	}
-	pkgs, err := impls.LoadPkgs(loadPkgs...)
+	pkgs, err := impls.LoadPkgs(flagIncludeTest, loadPkgs...)
 	if err != nil {
 		return err
 	}
