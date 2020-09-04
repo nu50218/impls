@@ -70,7 +70,7 @@ func (*c) Run(args []string) error {
 		checkPkgIncludedChan <- &CheckPkgIncludedResponse{included: included, err: err}
 	}()
 
-	pkgs, err := impls.LoadPkgs(loadPkgs...)
+	pkgs, err := impls.LoadPkgs(flagIncludeTest, loadPkgs...)
 	if err != nil {
 		return err
 	}
