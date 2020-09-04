@@ -37,8 +37,8 @@ func init() {
 		flagSet.PrintDefaults()
 	}
 
-	flagSet.BoolVar(&flagIncludeError, "e", true, "include error interface (default = true)")
-	flagSet.BoolVar(&flagIncludeTest, "t", false, "include test package (default = false)")
+	flagSet.BoolVar(&flagIncludeError, "e", true, "include error interface")
+	flagSet.BoolVar(&flagIncludeTest, "t", false, "include test package")
 }
 
 type c struct{}
