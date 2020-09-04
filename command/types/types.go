@@ -22,11 +22,13 @@ var flagSet = flag.NewFlagSet(name, flag.ExitOnError)
 
 // オプション
 var (
-	exported bool
+	exported        bool
+	flagIncludeTest bool
 )
 
 func init() {
 	flagSet.BoolVar(&exported, "exported", false, "only exported")
+	flagSet.BoolVar(&flagIncludeTest, "t", true, "include test package (default = true)")
 }
 
 type c struct{}
