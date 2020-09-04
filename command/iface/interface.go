@@ -27,7 +27,7 @@ var errorIface, _ = types.Universe.Lookup("error").Type().Underlying().(*types.I
 
 func init() {
 	flagSet.BoolVar(&flagIncludeError, "e", true, "include error interface (default = true)")
-	flagSet.BoolVar(&flagIncludeTest, "t", true, "include test package (default = true)")
+	flagSet.BoolVar(&flagIncludeTest, "t", false, "include test package (default = false)")
 }
 
 type c struct{}
