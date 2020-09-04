@@ -144,7 +144,7 @@ func (*c) Run(args []string) error {
 				continue
 			}
 
-			pos := pkg.Fset.Position(obj.Pos()).String()
+			pos := pkg.Fset.Position(iface.Pos()).String()
 			if _, ok := covered[pos]; ok {
 				continue
 			}
