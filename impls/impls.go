@@ -7,9 +7,9 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-func LoadPkgs(patterns ...string) ([]*packages.Package, error) {
+func LoadPkgs(incTest bool, patterns ...string) ([]*packages.Package, error) {
 	mode := packages.NeedSyntax | packages.NeedTypes | packages.NeedDeps | packages.NeedTypesInfo | packages.NeedImports
-	cfg := &packages.Config{Mode: mode}
+	cfg := &packages.Config{Mode: mode, Tests: incTest}
 	return packages.Load(cfg, patterns...)
 }
 
