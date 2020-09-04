@@ -39,7 +39,7 @@ func init() {
 	}
 
 	flagSet.BoolVar(&exported, "exported", false, "only exported")
-	flagSet.BoolVar(&flagIncludeTest, "t", false, "include test package (default = false)")
+	flagSet.BoolVar(&flagIncludeTest, "t", false, "include test package")
 }
 
 type c struct{}
