@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"go/build"
-	"go/token"
 	"go/types"
 	"reflect"
 	"strings"
@@ -87,12 +86,7 @@ func (*c) Run(args []string) error {
 		return err
 	}
 
-	type typeInfo struct {
-		pos token.Pos
-		typ string
-	}
-	covered := map[typeInfo]struct{}{}
-
+	covered := map[string]struct{}{}
 	for _, pkg := range pkgs {
 		if _, ok := paths[pkg.Types.Path()]; !ok && len(flagArgs) != 1 {
 			continue
@@ -109,17 +103,14 @@ func (*c) Run(args []string) error {
 				continue
 			}
 
-			ti := typeInfo{
-				pos: obj.Pos(),
-				typ: obj.Type().String(),
-			}
-			if _, ok := covered[ti]; ok {
+			pos := pkg.Fset.Position(obj.Pos()).String()
+			if _, ok := covered[pos]; ok {
 				continue
 			}
 
 			if impls.Implements(obj.Type(), i) {
-				covered[ti] = struct{}{}
-				fmt.Println(pkg.Fset.Position(obj.Pos()), pkg.Types.Name()+"."+obj.Name())
+				covered[pos] = struct{}{}
+				fmt.Println(pos, pkg.Types.Name()+"."+obj.Name())
 			}
 		}
 	}
