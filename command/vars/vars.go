@@ -27,6 +27,17 @@ var (
 )
 
 func init() {
+	flagSet.Usage = func() {
+		fmt.Printf("Usage of %s:\n", name)
+		fmt.Println()
+		fmt.Println("Examples:")
+		fmt.Println("  $ impls vars net/http.Handler")
+		fmt.Println("  $ impls vars error fmt")
+		fmt.Println()
+		fmt.Println("Options:")
+		flagSet.PrintDefaults()
+	}
+
 	flagSet.BoolVar(&exported, "exported", false, "only exported")
 	flagSet.BoolVar(&flagIncludeTest, "t", false, "include test package (default = false)")
 }
@@ -35,6 +46,14 @@ type c struct{}
 
 func (*c) Name() string {
 	return name
+}
+
+func (*c) Description() string {
+	return "find all variables by interface"
+}
+
+func (*c) FlagSet() *flag.FlagSet {
+	return flagSet
 }
 
 // Run 下のような感じで動かしたい

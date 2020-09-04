@@ -20,11 +20,12 @@ func run(args []string) error {
 
 	subCommand := args[0]
 	subCommands := []command.Command{
-		help.Command,
 		iface.Command,
 		types.Command,
 		vars.Command,
 	}
+
+	subCommands = append(subCommands, help.New(subCommands...))
 
 	for _, sc := range subCommands {
 		if sc.Name() == subCommand {
