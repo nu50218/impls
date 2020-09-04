@@ -39,7 +39,7 @@ func init() {
 	}
 
 	flagSet.BoolVar(&exported, "exported", false, "only exported")
-	flagSet.BoolVar(&flagIncludeTest, "t", true, "include test package (default = true)")
+	flagSet.BoolVar(&flagIncludeTest, "t", false, "include test package (default = false)")
 }
 
 type c struct{}
@@ -105,6 +105,7 @@ func (*c) Run(args []string) error {
 		return err
 	}
 
+	covered := map[string]struct{}{}
 	for _, pkg := range pkgs {
 		if _, ok := paths[pkg.Types.Path()]; !ok && len(flagArgs) != 1 {
 			continue
@@ -120,8 +121,15 @@ func (*c) Run(args []string) error {
 			if v == nil {
 				continue
 			}
+
+			pos := pkg.Fset.Position(obj.Pos()).String()
+			if _, ok := covered[pos]; ok {
+				continue
+			}
+
 			if impls.Implements(obj.Type(), i) {
-				fmt.Println(pkg.Fset.Position(obj.Pos()), pkg.Types.Name()+"."+obj.Name())
+				covered[pos] = struct{}{}
+				fmt.Println(pos, pkg.Types.Name()+"."+obj.Name())
 			}
 		}
 	}

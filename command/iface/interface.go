@@ -38,7 +38,7 @@ func init() {
 	}
 
 	flagSet.BoolVar(&flagIncludeError, "e", true, "include error interface (default = true)")
-	flagSet.BoolVar(&flagIncludeTest, "t", true, "include test package (default = true)")
+	flagSet.BoolVar(&flagIncludeTest, "t", false, "include test package (default = false)")
 }
 
 type c struct{}
@@ -131,6 +131,7 @@ func (*c) Run(args []string) error {
 		return err
 	}
 
+	covered := map[string]struct{}{}
 	for _, pkg := range pkgs {
 		if _, ok := paths[pkg.Types.Path()]; !ok && len(flagArgs) != 1 {
 			continue
@@ -143,13 +144,19 @@ func (*c) Run(args []string) error {
 				continue
 			}
 
+			pos := pkg.Fset.Position(obj.Pos()).String()
+			if _, ok := covered[pos]; ok {
+				continue
+			}
+
 			i, err := impls.UnderlyingInterface(iface.Type())
 			if err != nil {
 				continue
 			}
 
 			if impls.Implements(obj.Type(), i) {
-				fmt.Printf("%s %s.%s\n", pkg.Fset.Position(iface.Pos()), pkg.Types.Name(), iface.Name())
+				covered[pos] = struct{}{}
+				fmt.Printf("%s %s.%s\n", pos, pkg.Types.Name(), iface.Name())
 			}
 		}
 	}
