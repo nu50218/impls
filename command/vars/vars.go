@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go/build"
 	"go/types"
+	"reflect"
 	"strings"
 
 	"github.com/nu50218/impls/command"
@@ -104,7 +105,7 @@ func findInterface(s string, pkgs []*packages.Package) (*types.Interface, error)
 
 	for _, pkg := range pkgs {
 		obj := pkg.Types.Scope().Lookup(ifaceName)
-		if obj.Pkg().Path() != buildPkg.ImportPath {
+		if obj == nil || reflect.ValueOf(obj).IsNil() || obj.Pkg().Path() != buildPkg.ImportPath {
 			continue
 		}
 		i, err := impls.UnderlyingInterface(obj.Type())

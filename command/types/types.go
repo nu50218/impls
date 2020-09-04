@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go/build"
 	"go/types"
+	"reflect"
 	"strings"
 
 	"github.com/nu50218/impls/command"
@@ -49,9 +50,16 @@ func (*c) Run(args []string) error {
 	}
 
 	target := flagArgs[0]
+	var targetPkgPath string
 	loadPkgs := flagArgs[1:]
 	if strings.Contains(target, ".") {
-		loadPkgs = append(loadPkgs, target[:strings.LastIndex(target, ".")])
+		targetPkgPath = target[:strings.LastIndex(target, ".")]
+		loadPkgs = append(loadPkgs, targetPkgPath)
+	}
+
+	targetPkgIncluded, err := impls.CheckPkgIncluded(targetPkgPath, flagArgs[1:]...)
+	if err != nil {
+		return err
 	}
 	pkgs, err := impls.LoadPkgs(loadPkgs...)
 	if err != nil {
@@ -64,6 +72,10 @@ func (*c) Run(args []string) error {
 	}
 
 	for _, pkg := range pkgs {
+		if !targetPkgIncluded && pkg.PkgPath == targetPkgPath {
+			continue
+		}
+
 		scope := pkg.Types.Scope()
 		for _, n := range scope.Names() {
 			obj := scope.Lookup(n)
@@ -104,7 +116,7 @@ func findInterface(s string, pkgs []*packages.Package) (*types.Interface, error)
 
 	for _, pkg := range pkgs {
 		obj := pkg.Types.Scope().Lookup(ifaceName)
-		if obj.Pkg().Path() != buildPkg.ImportPath {
+		if obj == nil || reflect.ValueOf(obj).IsNil() || obj.Pkg().Path() != buildPkg.ImportPath {
 			continue
 		}
 		i, err := impls.UnderlyingInterface(obj.Type())
