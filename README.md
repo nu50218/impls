@@ -7,7 +7,7 @@ implsはinterfaceの実装を見つけたり、実装からinterfaceを見つけ
 
 ## Install
 
-`$ go get -u github.com/nu50218/impls`
+`$ go install github.com/nu50218/impls@latest`
 
 ## Usage
 
